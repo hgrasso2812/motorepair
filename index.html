@@ -134,61 +134,78 @@
     setInterval(() => {
         const now = new Date().getTime();
         const diff = now - startDate;
-
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
-
         document.getElementById("timer").innerText = `${d}d ${h}h ${m}m ${s}s`;
     }, 1000);
 
-    // Lógica de la Caja Rebelde
     const box = document.getElementById('box');
     const truck = document.getElementById('truck');
     const msg = document.getElementById('message');
     const gameArea = document.getElementById('game-area');
 
-    box.onmousedown = function(event) {
+    function handleStart(e) {
         msg.innerText = "";
-        let shiftX = event.clientX - box.getBoundingClientRect().left;
-        let shiftY = event.clientY - box.getBoundingClientRect().top;
+        // Prevenir scroll mientras jugamos en el celu
+        if (e.type === "touchstart") e.preventDefault();
+        
+        let clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+        let clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+        
+        let shiftX = clientX - box.getBoundingClientRect().left;
+        let shiftY = clientY - box.getBoundingClientRect().top;
 
         function moveAt(pageX, pageY) {
             let x = pageX - shiftX - gameArea.getBoundingClientRect().left;
             let y = pageY - shiftY - gameArea.getBoundingClientRect().top;
             
-            // Si se acerca mucho al camión, la caja "se asusta" y sale volando
             const truckRect = truck.getBoundingClientRect();
             const boxRect = box.getBoundingClientRect();
+            const dist = Math.hypot(truckRect.left + 75 - (boxRect.left + 30), truckRect.top + 35 - (boxRect.top + 25));
             
-            const dist = Math.hypot(truckRect.left + 60 - (boxRect.left + 30), truckRect.top + 30 - (boxRect.top + 25));
-            
-            if (dist < 80) { // Radio de asombro un poco más grande
+            if (dist < 90) {
                 msg.innerText = "MARTÍN DICE: 'TE LLAMO MAÑANA'";
                 x = Math.random() * (gameArea.clientWidth - 60);
                 y = Math.random() * (gameArea.clientHeight - 50);
-                document.removeEventListener('mousemove', onMouseMove);
+                stopDrag();
             }
-
             box.style.left = x + 'px';
             box.style.top = y + 'px';
         }
 
-        function onMouseMove(event) { moveAt(event.pageX, event.pageY); }
-        document.addEventListener('mousemove', onMouseMove);
-        box.onmouseup = function() { document.removeEventListener('mousemove', onMouseMove); };
-    };
+        function onMove(event) {
+            let pX = event.type === "touchmove" ? event.touches[0].pageX : event.pageX;
+            let pY = event.type === "touchmove" ? event.touches[0].pageY : event.pageY;
+            moveAt(pX, pY);
+        }
 
-    box.ondragstart = function() { return false; };
+        function stopDrag() {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('touchmove', onMove);
+        }
 
-    // Botón que huye
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, {passive: false});
+        
+        box.onmouseup = stopDrag;
+        box.ontouchend = stopDrag;
+    }
+
+    box.onmousedown = handleStart;
+    box.ontouchstart = handleStart;
+    box.ondragstart = () => false;
+
+    // Botón que huye (también para touch)
     const btnMartin = document.getElementById('btn-martin');
-    btnMartin.onmouseover = function() {
+    const huir = () => {
         btnMartin.style.position = 'absolute';
-        btnMartin.style.left = Math.random() * 80 + '%';
-        btnMartin.style.top = Math.random() * 80 + '%';
+        btnMartin.style.left = Math.random() * 70 + '%';
+        btnMartin.style.top = Math.random() * 70 + '%';
     };
+    btnMartin.onmouseover = huir;
+    btnMartin.ontouchstart = (e) => { e.preventDefault(); huir(); };
 </script>
 
 </body>
