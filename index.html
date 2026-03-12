@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yamaha Infinite Repair - El Contador de la Vergüenza</title>
+    <title>Yamaha Infinite Logistics - El Contador de la Vergüenza</title>
     <style>
         body { font-family: 'Courier New', Courier, monospace; background: #1a1a1a; color: #00ff00; text-align: center; padding: 20px; overflow-x: hidden; }
         .container { max-width: 800px; margin: auto; border: 2px solid #00ff00; padding: 20px; box-shadow: 0 0 15px #00ff00; }
@@ -11,43 +11,67 @@
         #timer { font-size: 2.5rem; margin: 20px 0; font-weight: bold; background: #333; padding: 10px; border-radius: 5px; }
         .status { margin-bottom: 20px; font-style: italic; color: #aaa; }
         
-        /* El Juego */
-        #game-area { width: 100%; height: 300px; background: #000; border: 1px dashed #555; position: relative; margin-top: 30px; cursor: crosshair; overflow: hidden; }
-        #screw { width: 40px; height: 40px; position: absolute; cursor: grab; transition: transform 0.1s; }
-        #hole { width: 50px; height: 50px; background: #333; border-radius: 50%; border: 3px solid #666; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        /* El Juego Logístico - Agrandado */
+        #game-area { width: 100%; height: 400px; /* Agrandado de 300px a 400px */ background: #000; border: 1px dashed #555; position: relative; margin-top: 30px; cursor: crosshair; overflow: hidden; }
+        
+        /* Caja Logística */
+        #box { width: 60px; height: 50px; background: #8b4513; border: 2px solid #5d2e0a; position: absolute; cursor: grab; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: bold; text-transform: uppercase; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        #box::before { content: "BOBINA"; }
+
+        /* Camión Logístico */
+        #truck { width: 120px; height: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+        .truck-cab { width: 40px; height: 40px; background: #cc0000; border-radius: 5px 5px 0 0; position: relative; }
+        .truck-window { width: 25px; height: 15px; background: #333; position: absolute; top: 5px; left: 7px; border-radius: 2px; }
+        .truck-trailer { width: 80px; height: 50px; background: #444; border: 2px solid #222; position: absolute; top: 10px; left: 40px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #00ff00; }
+        .truck-trailer::before { content: "YAMAHA LOGISTICS"; text-align: center;}
+        .truck-wheel { width: 15px; height: 15px; background: #111; border-radius: 50%; position: absolute; bottom: -7px; }
+        .wheel1 { left: 10px; } .wheel2 { left: 50px; } .wheel3 { left: 90px; }
+
         #message { color: #ff0000; font-weight: bold; height: 20px; margin-top: 10px; }
         
         .btn-fake { background: #444; color: #fff; border: none; padding: 10px 20px; margin: 10px; cursor: not-allowed; position: relative; }
+        
+        /* Contenedor de firma para que no se pise */
+        .footer-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Yamaha FZ FI 3.0: Espera Infinita</h1>
-    <p>La logística de una bobina que viaja a la velocidad de un glaciar.</p>
+    <h1>Yamaha Infinite Logistics: La Odisea de la Bobina</h1>
+    <p>Administrando la logística de un glaciar con Parkinson.</p>
     
     <div id="timer">00d 00h 00m 00s</div>
     <div class="status">Estado actual: "La pieza está en tránsito... estimo"</div>
 
     <div id="game-area">
-        <p style="font-size: 12px; color: #555;">MINIJUEGO: Intenta poner el tornillo en la tapa de válvulas</p>
-        <div id="hole"></div>
-        <div id="screw" style="top: 20px; left: 20px; width: 40px; height: 40px; background: radial-gradient(circle, #888, #444); border: 2px solid #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);">
-    <div style="width: 30px; height: 4px; background: #222; transform: rotate(45deg);"></div>
-</div>
+        <p style="font-size: 12px; color: #555;">MINIJUEGO: Intenta cargar la caja en el camión de reparto</p>
+        
+        <div id="truck">
+            <div class="truck-cab"><div class="truck-window"></div></div>
+            <div class="truck-trailer"></div>
+            <div class="truck-wheel wheel1"></div>
+            <div class="truck-wheel wheel2"></div>
+            <div class="truck-wheel wheel3"></div>
+        </div>
+
+        <div id="box" style="top: 20px; left: 20px;"></div>
+    </div>
     <div id="message"></div>
 
     <button class="btn-fake" id="btn-martin">Llamar a Martín</button>
     <button class="btn-fake" id="btn-yamaha">Reclamar a Yamaha</button>
     
-    <p style="margin-top: 20px; font-size: 0.8rem; color: #666;">
-        Expediente Defensa del Consumidor: #1665804 | Un proyecto de Hernán vs. La Inercia Corporativa.
-    </p>
+    <div class="footer-info">
+        <p style="font-size: 0.8rem; color: #666;">
+            Expediente Defensa del Consumidor: #1665804 | Un proyecto de Hernán vs. La Inercia Corporativa.
+        </p>
+    </div>
 </div>
 
 <script>
-    // CONFIGURACIÓN: Fecha de ingreso al taller (04/02/2026 14:00 por ejemplo)
-    const startDate = new Date("February 4, 2026 14:00:00").getTime();
+    // CONFIGURACIÓN: Fecha de ingreso al taller (04/02/2026 14:00)
+    const startDate = new Date("February 4, 2026 09:00:00").getTime();
 
     // Contador
     setInterval(() => {
@@ -62,44 +86,44 @@
         document.getElementById("timer").innerText = `${d}d ${h}h ${m}m ${s}s`;
     }, 1000);
 
-    // Lógica del Tornillo Rebelde
-    const screw = document.getElementById('screw');
-    const hole = document.getElementById('hole');
+    // Lógica de la Caja Rebelde
+    const box = document.getElementById('box');
+    const truck = document.getElementById('truck');
     const msg = document.getElementById('message');
     const gameArea = document.getElementById('game-area');
 
-    screw.onmousedown = function(event) {
+    box.onmousedown = function(event) {
         msg.innerText = "";
-        let shiftX = event.clientX - screw.getBoundingClientRect().left;
-        let shiftY = event.clientY - screw.getBoundingClientRect().top;
+        let shiftX = event.clientX - box.getBoundingClientRect().left;
+        let shiftY = event.clientY - box.getBoundingClientRect().top;
 
         function moveAt(pageX, pageY) {
             let x = pageX - shiftX - gameArea.getBoundingClientRect().left;
             let y = pageY - shiftY - gameArea.getBoundingClientRect().top;
             
-            // Si se acerca mucho al agujero, el tornillo "se asusta" y sale volando
-            const holeRect = hole.getBoundingClientRect();
-            const screwRect = screw.getBoundingClientRect();
+            // Si se acerca mucho al camión, la caja "se asusta" y sale volando
+            const truckRect = truck.getBoundingClientRect();
+            const boxRect = box.getBoundingClientRect();
             
-            const dist = Math.hypot(holeRect.left - screwRect.left, holeRect.top - screwRect.top);
+            const dist = Math.hypot(truckRect.left + 60 - (boxRect.left + 30), truckRect.top + 30 - (boxRect.top + 25));
             
-            if (dist < 60) {
+            if (dist < 80) { // Radio de asombro un poco más grande
                 msg.innerText = "MARTÍN DICE: 'TE LLAMO MAÑANA'";
-                x = Math.random() * (gameArea.clientWidth - 40);
-                y = Math.random() * (gameArea.clientHeight - 40);
+                x = Math.random() * (gameArea.clientWidth - 60);
+                y = Math.random() * (gameArea.clientHeight - 50);
                 document.removeEventListener('mousemove', onMouseMove);
             }
 
-            screw.style.left = x + 'px';
-            screw.style.top = y + 'px';
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
         }
 
         function onMouseMove(event) { moveAt(event.pageX, event.pageY); }
         document.addEventListener('mousemove', onMouseMove);
-        screw.onmouseup = function() { document.removeEventListener('mousemove', onMouseMove); };
+        box.onmouseup = function() { document.removeEventListener('mousemove', onMouseMove); };
     };
 
-    screw.ondragstart = function() { return false; };
+    box.ondragstart = function() { return false; };
 
     // Botón que huye
     const btnMartin = document.getElementById('btn-martin');
