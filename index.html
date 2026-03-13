@@ -127,10 +127,10 @@
 </div>
 
 <script>
-    // CONFIGURACIÓN: Fecha de ingreso al taller (04/02/2026 14:00)
-    const startDate = new Date("February 4, 2026 09:00:00").getTime();
+    // CONFIGURACIÓN: Fecha de ingreso al taller
+    const startDate = new Date("February 4, 2026 14:00:00").getTime();
 
-    // Contador
+    // Contador de tiempo (el mismo de antes)
     setInterval(() => {
         const now = new Date().getTime();
         const diff = now - startDate;
@@ -146,9 +146,18 @@
     const msg = document.getElementById('message');
     const gameArea = document.getElementById('game-area');
 
+    // Lista de excusas de Martín
+    const excusas = [
+        "MARTÍN DICE: 'TE LLAMO MAÑANA'",
+        "MARTÍN DICE: 'NO TENGO STOCK'",
+        "MARTÍN DICE: 'YAMAHA NO ME CONFIRMÓ NADA'",
+        "MARTÍN DICE: 'TENGO MUCHO TRABAJO'",
+        "MARTÍN DICE: 'EL CAMIÓN SE ROMPIÓ'",
+        "MARTÍN DICE: 'SISTEMA CAÍDO, VENITE EL LUNES'"
+    ];
+
     function handleStart(e) {
         msg.innerText = "";
-        // Prevenir scroll mientras jugamos en el celu
         if (e.type === "touchstart") e.preventDefault();
         
         let clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
@@ -166,7 +175,11 @@
             const dist = Math.hypot(truckRect.left + 75 - (boxRect.left + 30), truckRect.top + 35 - (boxRect.top + 25));
             
             if (dist < 90) {
-                msg.innerText = "MARTÍN DICE: 'TE LLAMO MAÑANA'";
+                // Selecciona una excusa al azar
+                const fraseRandom = excusas[Math.floor(Math.random() * excusas.length)];
+                msg.innerText = fraseRandom;
+                
+                // La caja sale volando a un lugar random
                 x = Math.random() * (gameArea.clientWidth - 60);
                 y = Math.random() * (gameArea.clientHeight - 50);
                 stopDrag();
@@ -195,9 +208,8 @@
 
     box.onmousedown = handleStart;
     box.ontouchstart = handleStart;
-    box.ondragstart = () => false;
 
-    // Botón que huye (también para touch)
+    // Botón de Martín (Sigue escapando)
     const btnMartin = document.getElementById('btn-martin');
     const huir = () => {
         btnMartin.style.position = 'absolute';
@@ -206,6 +218,22 @@
     };
     btnMartin.onmouseover = huir;
     btnMartin.ontouchstart = (e) => { e.preventDefault(); huir(); };
+
+    // LÓGICA DEL BOTÓN YAMAHA (EL REBELDE)
+    const btnYamaha = document.getElementById('btn-yamaha');
+    btnYamaha.style.cursor = "pointer"; // Para que parezca que se puede clickear
+    
+    btnYamaha.onclick = function() {
+        btnYamaha.innerText = "NO RECLAMAR A YAMAHA";
+        btnYamaha.style.background = "#ff0000";
+        btnYamaha.disabled = true;
+
+        setTimeout(() => {
+            btnYamaha.innerText = "RECLAMAR A YAMAHA";
+            btnYamaha.style.background = "#444";
+            btnYamaha.disabled = false;
+        }, 3000);
+    };
 </script>
 
 </body>
